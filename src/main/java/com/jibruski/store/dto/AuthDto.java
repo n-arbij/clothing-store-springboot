@@ -1,6 +1,6 @@
-package com.jibruski.dto;
+package com.jibruski.store.dto;
 
-import com.jibruski.enums.UserRole;
+import com.jibruski.store.enums.UserRole;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

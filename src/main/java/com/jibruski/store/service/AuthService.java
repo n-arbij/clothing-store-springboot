@@ -1,14 +1,14 @@
-package com.jibruski.service;
+package com.jibruski.store.service;
 
 import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.jibruski.dto.AuthDto.AuthRequest;
-import com.jibruski.dto.AuthDto.AuthResponse;
-import com.jibruski.repository.UserRepository;
 import com.jibruski.store.domain.User;
+import com.jibruski.store.dto.AuthDto.AuthRequest;
+import com.jibruski.store.dto.AuthDto.AuthResponse;
+import com.jibruski.store.repository.UserRepository;
 import com.yourorg.jwtauth.model.UserPrincipal;
 import com.yourorg.jwtauth.service.JwtService;
 

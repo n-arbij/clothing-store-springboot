@@ -1,4 +1,4 @@
-package com.jibruski.security;
+package com.jibruski.store.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

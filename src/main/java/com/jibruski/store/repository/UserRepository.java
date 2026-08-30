@@ -1,4 +1,4 @@
-package com.jibruski.repository;
+package com.jibruski.store.repository;
 
 import java.util.Optional;
 

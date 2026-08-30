@@ -1,4 +1,4 @@
-package com.jibruski.enums;
+package com.jibruski.store.enums;
 
 public enum UserRole {
     CUSTOMER,

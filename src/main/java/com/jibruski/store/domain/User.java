@@ -1,6 +1,6 @@
 package com.jibruski.store.domain;
 
-import com.jibruski.enums.UserRole;
+import com.jibruski.store.enums.UserRole;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
