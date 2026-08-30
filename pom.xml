@@ -59,6 +59,16 @@
 			<artifactId>jwt-auth-starter</artifactId>
 			<version>v1.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.netbeans.external</groupId>
+			<artifactId>org-apache-commons-codec</artifactId>
+			<version>RELEASE310</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mvnpm</groupId>
+			<artifactId>dotenv</artifactId>
+			<version>17.4.2</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
