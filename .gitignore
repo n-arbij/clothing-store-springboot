@@ -40,3 +40,4 @@ mvnw.cmd
 ## Environment files
 application.properties
 .env
+*.pem

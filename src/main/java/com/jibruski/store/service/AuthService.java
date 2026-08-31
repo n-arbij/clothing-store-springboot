@@ -14,8 +14,8 @@ import com.jibruski.store.dto.AuthDto.AuthRequest;
 import com.jibruski.store.dto.AuthDto.AuthResponse;
 import com.jibruski.store.repository.RefreshTokenRepository;
 import com.jibruski.store.repository.UserRepository;
-import com.yourorg.jwtauth.model.UserPrincipal;
-import com.yourorg.jwtauth.service.JwtService;
+import com.jibruski.jwtauth.model.UserPrincipal;
+import com.jibruski.jwtauth.service.JwtService;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
