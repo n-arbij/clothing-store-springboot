@@ -6,7 +6,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class AuthDto {
-    public record AuthRequest (
+    public record RegisterRequest (
+        @NotBlank @Email String email,
+        @NotBlank String password,
+        String phoneNumber
+    ) {}
+
+    public record LoginRequest (
         @NotBlank @Email String email,
         @NotBlank String password
     ) {}

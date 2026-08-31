@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.jibruski.store.domain.RefreshToken;
 import com.jibruski.store.domain.User;
-import com.jibruski.store.dto.AuthDto.AuthRequest;
 import com.jibruski.store.dto.AuthDto.AuthResponse;
+import com.jibruski.store.dto.AuthDto.LoginRequest;
+import com.jibruski.store.dto.AuthDto.RegisterRequest;
+import com.jibruski.store.enums.UserRole;
 import com.jibruski.store.repository.RefreshTokenRepository;
 import com.jibruski.store.repository.UserRepository;
 import com.jibruski.jwtauth.model.UserPrincipal;
@@ -28,7 +30,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public AuthResponse register(AuthRequest request){
+    public AuthResponse register(RegisterRequest request){
         if (userRepository.findByEmail(request.email()).isPresent()) {
             throw new RuntimeException("Email already in use");
         }
@@ -36,12 +38,14 @@ public class AuthService {
         User user = new User();
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
+        user.setRole(UserRole.CUSTOMER);
+        user.setPhoneNumber(request.phoneNumber() != null ? request.phoneNumber() : null);
         userRepository.save(user);
 
-        return login(request);
+        return login(new LoginRequest(request.email(), request.password()));
     }
 
-    public AuthResponse login(AuthRequest request) {
+    public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email()).orElse(null);
         if(user == null || !passwordEncoder.matches(request.password(), user.getPassword())){
             throw new RuntimeException("Invalid credentials");
