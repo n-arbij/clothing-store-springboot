@@ -34,11 +34,14 @@ public class ProductVariant extends BaseModel{
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @Column(unique = true, nullable = false)
+    private String sku;
+
     @Enumerated(EnumType.STRING)
     private ProductSize size;
 
+    @Column(nullable = false)
     private String color;
-    private String material;
 
     @Column(nullable = false)
     private int stockQuantity;
@@ -50,4 +53,8 @@ public class ProductVariant extends BaseModel{
     @CollectionTable(name = "product_image_urls", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image_url")
     private List<String> imageUrls = new ArrayList<>();
+
+    private boolean soldOut;
+
+    private boolean active;
 }
