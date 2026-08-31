@@ -1,8 +1,13 @@
 package com.jibruski.store.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.jibruski.store.enums.ProductSize;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -40,4 +45,9 @@ public class ProductVariant extends BaseModel{
 
     @Version
     private Long version;
+
+    @ElementCollection
+    @CollectionTable(name = "product_image_urls", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image_url")
+    private List<String> imageUrls = new ArrayList<>();
 }
