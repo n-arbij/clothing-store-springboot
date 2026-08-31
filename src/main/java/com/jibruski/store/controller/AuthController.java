@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jibruski.store.dto.AuthDto.AuthResponse;
 import com.jibruski.store.dto.AuthDto.LoginRequest;
+import com.jibruski.store.dto.AuthDto.RefreshRequest;
+import com.jibruski.store.dto.AuthDto.RefreshResponse;
 import com.jibruski.store.dto.AuthDto.RegisterRequest;
 import com.jibruski.store.service.AuthService;
 
@@ -34,13 +36,13 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<String> refresh(@RequestBody String refreshToken) {
-        return ResponseEntity.ok(authService.refreshAccessToken(refreshToken));
+    public ResponseEntity<RefreshResponse> refresh(@Valid @RequestBody RefreshRequest request) {
+        return ResponseEntity.ok(authService.refreshAccessToken(request));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody String refreshToken) {
-        authService.logout(refreshToken);
+    public ResponseEntity<Void> logout(@Valid @RequestBody RefreshRequest request) {
+        authService.logout(request);
         return ResponseEntity.noContent().build();
     }
 }

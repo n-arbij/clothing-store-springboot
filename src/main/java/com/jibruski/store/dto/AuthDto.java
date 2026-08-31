@@ -17,10 +17,18 @@ public class AuthDto {
         @NotBlank String password
     ) {}
 
+    public record RefreshRequest (
+        @NotBlank String refreshToken
+    ) {}
+
     public record AuthResponse (
         String accessToken,
         String refreshToken,
         String email,
         UserRole role
+    ) {}
+
+    public record RefreshResponse (
+        String accessToken
     ) {}
 }

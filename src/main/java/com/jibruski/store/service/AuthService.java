@@ -12,6 +12,8 @@ import com.jibruski.store.domain.RefreshToken;
 import com.jibruski.store.domain.User;
 import com.jibruski.store.dto.AuthDto.AuthResponse;
 import com.jibruski.store.dto.AuthDto.LoginRequest;
+import com.jibruski.store.dto.AuthDto.RefreshRequest;
+import com.jibruski.store.dto.AuthDto.RefreshResponse;
 import com.jibruski.store.dto.AuthDto.RegisterRequest;
 import com.jibruski.store.enums.UserRole;
 import com.jibruski.store.repository.RefreshTokenRepository;
@@ -58,20 +60,20 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken, user.getEmail(), user.getRole());
     }
     
-    public String refreshAccessToken(String refreshToken) {
-        Claims claims = jwtService.parseAndValidate(refreshToken);
+    public RefreshResponse refreshAccessToken(RefreshRequest request) {
+        Claims claims = jwtService.parseAndValidate(request.refreshToken());
         if (!jwtService.isRefreshToken(claims)) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        validateAndGet(refreshToken);
+        validateAndGet(request.refreshToken());
 
         UserPrincipal principal = jwtService.toPrincipal(claims);
-        return jwtService.issueAccessToken(principal);
+        return new RefreshResponse(jwtService.issueAccessToken(principal));
     }
 
-    public void logout(String refreshToken) {
-        revoke(refreshToken);
+    public void logout(RefreshRequest request) {
+        revoke(request.refreshToken());
     }
 
     private String createRefreshToken(User user) {
