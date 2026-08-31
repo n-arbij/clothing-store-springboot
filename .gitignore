@@ -36,3 +36,8 @@ build/
 .mvn/
 mvnw
 mvnw.cmd
+
+## Environment files
+application.properties
+.env
+*.pem
