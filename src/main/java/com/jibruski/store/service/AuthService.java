@@ -8,6 +8,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.jibruski.store.domain.Cart;
 import com.jibruski.store.domain.RefreshToken;
 import com.jibruski.store.domain.User;
 import com.jibruski.store.dto.AuthDto.AuthResponse;
@@ -16,6 +17,7 @@ import com.jibruski.store.dto.AuthDto.RefreshRequest;
 import com.jibruski.store.dto.AuthDto.RefreshResponse;
 import com.jibruski.store.dto.AuthDto.RegisterRequest;
 import com.jibruski.store.enums.UserRole;
+import com.jibruski.store.repository.CartRepository;
 import com.jibruski.store.repository.RefreshTokenRepository;
 import com.jibruski.store.repository.UserRepository;
 import com.jibruski.jwtauth.model.UserPrincipal;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final CartRepository cartRepository;
     private final RefreshTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -43,6 +46,10 @@ public class AuthService {
         user.setRole(UserRole.CUSTOMER);
         user.setPhoneNumber(request.phoneNumber() != null ? request.phoneNumber() : null);
         userRepository.save(user);
+
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cartRepository.save(cart);
 
         return login(new LoginRequest(request.email(), request.password()));
     }
