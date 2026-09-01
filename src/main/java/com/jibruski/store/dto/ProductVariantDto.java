@@ -1,0 +1,39 @@
+package com.jibruski.store.dto;
+
+import com.jibruski.store.domain.ProductVariant;
+import com.jibruski.store.enums.ProductSize;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public class ProductVariantDto {
+    public record ProductVariantReq(
+        @NotNull Long productId,
+        @NotBlank String sku,
+        ProductSize size,
+        @NotBlank String color,
+        @NotNull int stockQuantity
+    ) {}
+
+    public record ProductVariantRes(
+        Long id,
+        String productName,
+        String sku,
+        ProductSize size,
+        String color,
+        int stockQuantity,
+        boolean soldOut
+    ) {
+        public static ProductVariantRes fromEntity(ProductVariant productVariant){
+            return new ProductVariantRes(
+                productVariant.getId(),
+                productVariant.getProduct().getName(),
+                productVariant.getSku(),
+                productVariant.getSize(),
+                productVariant.getColor(),
+                productVariant.getStockQuantity(),
+                productVariant.isSoldOut()
+            );
+        }
+    }
+}
