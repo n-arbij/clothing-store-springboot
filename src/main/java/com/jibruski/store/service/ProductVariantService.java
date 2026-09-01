@@ -77,7 +77,7 @@ public class ProductVariantService {
 
     private Product getProduct(Long id){
         Product product = productRepository.findByIdAndActiveTrue(id).orElse(null);
-        if(product == null || product.getUser().getId().equals(userService.getCurrentUserId())){
+        if(product == null || !product.getUser().getId().equals(userService.getCurrentUserId())){
             throw new RuntimeException("Product not found");
         }
          return product;
