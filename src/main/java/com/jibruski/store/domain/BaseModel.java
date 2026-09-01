@@ -5,7 +5,10 @@ import java.time.Instant;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-public class BaseModel {
+import jakarta.persistence.MappedSuperclass;
+
+@MappedSuperclass
+public abstract class BaseModel {
     @CreatedDate
     private Instant createdAt;
 
