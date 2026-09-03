@@ -62,8 +62,9 @@ public class CartService {
 
     @Transactional
     public void updateItemQuantity(Long cartItemId, int quantity){
-        validationService.validateStockAvailability(cartItemId, quantity);
         CartItem item = getCartItem(cartItemId);
+
+        validationService.validateStockAvailability(item.getVariant().getId(), quantity);
         item.setQuantity(quantity);
         itemRepository.save(item);
     }
