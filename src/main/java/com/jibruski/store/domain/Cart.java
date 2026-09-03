@@ -27,6 +27,6 @@ public class Cart extends BaseModel{
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "cart")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "cart", orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();    
 }
