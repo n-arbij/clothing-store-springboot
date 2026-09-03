@@ -1,10 +1,13 @@
 package com.jibruski.store.dto;
 
+import java.math.BigDecimal;
+
 import com.jibruski.store.domain.ProductVariant;
 import com.jibruski.store.enums.ProductSize;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class ProductVariantDto {
     public record ProductVariantReq(
@@ -12,6 +15,7 @@ public class ProductVariantDto {
         @NotBlank String sku,
         ProductSize size,
         @NotBlank String color,
+        @NotNull @Positive BigDecimal price,
         @NotNull int stockQuantity
     ) {}
 
@@ -21,6 +25,7 @@ public class ProductVariantDto {
         String sku,
         ProductSize size,
         String color,
+        BigDecimal price,
         int stockQuantity,
         boolean soldOut
     ) {
@@ -31,6 +36,7 @@ public class ProductVariantDto {
                 productVariant.getSku(),
                 productVariant.getSize(),
                 productVariant.getColor(),
+                productVariant.getPrice(),
                 productVariant.getStockQuantity(),
                 productVariant.isSoldOut()
             );
