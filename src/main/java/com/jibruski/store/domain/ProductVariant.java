@@ -1,5 +1,6 @@
 package com.jibruski.store.domain;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,9 @@ public class ProductVariant extends BaseModel{
 
     @Column(nullable = false)
     private String color;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
 
     @Column(nullable = false)
     private int stockQuantity;

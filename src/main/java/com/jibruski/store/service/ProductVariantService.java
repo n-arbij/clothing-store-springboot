@@ -48,6 +48,7 @@ public class ProductVariantService {
         variant.setSku(req.sku());
         variant.setSize(req.size());
         variant.setColor(req.color());
+        variant.setPrice(req.price());
         variant.setStockQuantity(req.stockQuantity());
         variant.setSoldOut(false);
         variant.setActive(true);
