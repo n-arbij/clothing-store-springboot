@@ -84,14 +84,23 @@ public class OrderService {
     }
 
     @Transactional
+    public void markAsPaid(Long orderId){
+        Order order = getOrder(orderId);
+        if(order.getStatus() != OrderStatus.PENDING){
+            throw new RuntimeException("Order must be pending before it can be marked paid");
+        }
+        order.setStatus(OrderStatus.PAID);
+        orderRepository.save(order);
+    }
+
+    @Transactional
     public void markAsShipped(Long orderId){
         Order order = getOrder(orderId);
-        if(order.getStatus() == OrderStatus.PAID){
-            order.setStatus(OrderStatus.SHIPPED);
-            orderRepository.save(order);
-        } else {
-            throw new RuntimeException("Order needs to be paid");
+        if(order.getStatus() != OrderStatus.PAID){
+            throw new RuntimeException("Order must be paid before being shipped");
         }
+        order.setStatus(OrderStatus.SHIPPED);
+        orderRepository.save(order);
     }
 
     @Transactional

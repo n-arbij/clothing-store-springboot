@@ -42,6 +42,12 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.checkout());
     }
 
+    @PatchMapping("/{orderId}/pay")
+    public ResponseEntity<Void> markAsPaid(@PathVariable Long orderId) {
+        orderService.markAsPaid(orderId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/{orderId}/ship")
     public ResponseEntity<Void> markAsShipped(@PathVariable Long orderId) {
         orderService.markAsShipped(orderId);
