@@ -44,7 +44,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse convertCartToOrder(){
+    public OrderResponse checkout(){
         Cart cart = cartRepository.findByUserId(userService.getCurrentUserId()).orElseThrow(
             () -> new RuntimeException("Cart not found")
         );

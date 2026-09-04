@@ -22,11 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
     private final OrderService orderService;
 
-    @PostMapping("/checkout")
-    public ResponseEntity<OrderResponse> checkout() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.convertCartToOrder());
-    }
-
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId) {
         return ResponseEntity.ok(orderService.getById(orderId));
@@ -37,9 +32,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getByUser(pageable));
     }
 
-    @GetMapping("/admin/all")
+    @GetMapping("/all")
     public ResponseEntity<Page<OrderResponse>> getAll(Pageable pageable) {
         return ResponseEntity.ok(orderService.getAll(pageable));
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<OrderResponse> checkout() {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.checkout());
     }
 
     @PatchMapping("/{orderId}/ship")
