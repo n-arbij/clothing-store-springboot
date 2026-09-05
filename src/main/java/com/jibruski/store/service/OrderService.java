@@ -2,6 +2,7 @@ package com.jibruski.store.service;
 
 import java.math.BigDecimal;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,11 +12,15 @@ import com.jibruski.store.domain.CartItem;
 import com.jibruski.store.domain.Order;
 import com.jibruski.store.domain.OrderItem;
 import com.jibruski.store.domain.ProductVariant;
+import com.jibruski.store.dto.OrderDto.CheckoutReq;
 import com.jibruski.store.dto.OrderDto.OrderResponse;
+import com.jibruski.store.dto.OrderDto.RetryPaymentReq;
 import com.jibruski.store.enums.OrderStatus;
 import com.jibruski.store.repository.CartRepository;
 import com.jibruski.store.repository.OrderRepository;
 import com.jibruski.store.repository.ProductVariantRepository;
+import com.jibruski.store.service.PaymentService.PaymentFailedEvent;
+import com.jibruski.store.service.PaymentService.PaymentSucceededEvent;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +33,17 @@ public class OrderService {
     private final ProductVariantRepository variantRepository;
     private final CurrentUserService userService;
     private final StockValidationService validationService;
+    private final PaymentService paymentService;
+
+    @EventListener
+    public void OnPaymentSucceeded(PaymentSucceededEvent event){
+        markAsPaid(event.orderId());
+    }
+
+    @EventListener
+    public void OnPaymentFailed(PaymentFailedEvent event){
+        markAsPaymentFailed(event.orderId());
+    }
 
     public OrderResponse getById(Long id){
         return OrderResponse.fromEntity(getOrder(id));
@@ -44,7 +60,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse checkout(){
+    public OrderResponse checkout(CheckoutReq req){
         Cart cart = cartRepository.findByUserId(userService.getCurrentUserId()).orElseThrow(
             () -> new RuntimeException("Cart not found")
         );
@@ -79,6 +95,7 @@ public class OrderService {
 
         order.setTotalAmount(total);
         Order savedOrder = orderRepository.save(order);
+        paymentService.initiatePayment(savedOrder, req.method());
          
         return OrderResponse.fromEntity(savedOrder);
     }
@@ -114,6 +131,16 @@ public class OrderService {
     }
 
     @Transactional
+    public void markAsPaymentFailed(Long orderId){
+        Order order = getOrder(orderId);
+        if(order.getStatus() != OrderStatus.PENDING){
+            throw new RuntimeException("Payment fails only on pending transactions");
+        }
+        order.setStatus(OrderStatus.PAYMENT_FAILED);
+        orderRepository.save(order);
+    }
+
+    @Transactional
     public void cancelOrder(Long orderId){
         Order order = getOrder(orderId);
         if(order.getStatus() != OrderStatus.PENDING || order.getStatus() != OrderStatus.PAID){
@@ -128,6 +155,15 @@ public class OrderService {
 
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
+    }
+
+    @Transactional
+    public void retryPayment(RetryPaymentReq req) {
+        Order order = getOrder(req.orderId());
+        if (order.getStatus() != OrderStatus.PAYMENT_FAILED) {
+            throw new RuntimeException("Only failed payments can be retried");
+        }
+        paymentService.initiatePayment(order, req.method());
     }
 
     private Order getOrder(Long id){
