@@ -21,7 +21,6 @@ import com.jibruski.store.repository.CartRepository;
 import com.jibruski.store.repository.OrderRepository;
 import com.jibruski.store.repository.ProductVariantRepository;
 import com.jibruski.store.service.PaymentService.PaymentFailedEvent;
-import com.jibruski.store.service.PaymentService.PaymentRefundedEvent;
 import com.jibruski.store.service.PaymentService.PaymentSucceededEvent;
 
 import jakarta.transaction.Transactional;
@@ -45,14 +44,6 @@ public class OrderService {
     @EventListener
     public void OnPaymentFailed(PaymentFailedEvent event){
         markAsPaymentFailed(event.orderId());
-    }
-
-    @EventListener
-    public void onPaymentRefunded(PaymentRefundedEvent event){
-        Order order = getOrder(event.orderId());
-        restoreStock(order.getOrderItems());
-        order.setStatus(OrderStatus.REFUNDED);
-        orderRepository.save(order);
     }
 
     public OrderResponse getById(Long id){

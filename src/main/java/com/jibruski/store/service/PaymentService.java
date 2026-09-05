@@ -81,5 +81,4 @@ public class PaymentService {
 
     public record PaymentSucceededEvent(Long orderId) {}
     public record PaymentFailedEvent(Long orderId) {}
-    public record PaymentRefundedEvent(Long orderId) {}
 }
