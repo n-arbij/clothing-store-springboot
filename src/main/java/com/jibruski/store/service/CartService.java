@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
 import com.jibruski.store.domain.Cart;
 import com.jibruski.store.domain.CartItem;
 import com.jibruski.store.dto.CartDto.AddToCartReq;
@@ -85,7 +86,7 @@ public class CartService {
     private CartItem getCartItem(Long id){
         CartItem item = itemRepository.findById(id).orElse(null);
         if(item == null || !item.getCart().getUser().getId().equals(userService.getCurrentUserId())){
-            throw new RuntimeException("Cart item not found");
+            throw new ResourceNotFoundException("Cart item not found");
         }
 
         return item;
@@ -93,7 +94,7 @@ public class CartService {
 
     private Cart getCart(){
         return cartRepository.findByUserId(userService.getCurrentUserId())
-            .orElseThrow(() -> new RuntimeException("Cart not found for user"));
+            .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user"));
     }
 
     private BigDecimal calculateCartTotal(List<CartItemResponse> items) {

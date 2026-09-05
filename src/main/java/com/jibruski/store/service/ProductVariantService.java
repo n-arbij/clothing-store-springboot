@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
 import com.jibruski.store.domain.Product;
 import com.jibruski.store.domain.ProductVariant;
 import com.jibruski.store.dto.ProductVariantDto.ProductVariantReq;
@@ -79,7 +80,7 @@ public class ProductVariantService {
     private Product getProduct(Long id){
         Product product = productRepository.findByIdAndActiveTrue(id).orElse(null);
         if(product == null || !product.getUser().getId().equals(userService.getCurrentUserId())){
-            throw new RuntimeException("Product not found");
+            throw new ResourceNotFoundException("Product not found");
         }
          return product;
     }
@@ -88,7 +89,7 @@ public class ProductVariantService {
         ProductVariant variant = variantRepository.findByIdAndActiveTrue(id).orElse(null);
 
         if(variant == null || !variant.getProduct().getUser().getId().equals(userService.getCurrentUserId())){
-            throw new RuntimeException("Product variant not found");
+            throw new ResourceNotFoundException("Product variant not found");
         }
 
         return variant;

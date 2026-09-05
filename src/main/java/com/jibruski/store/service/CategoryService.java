@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.ConflictException;
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
+import com.jibruski.exceptionstarter.exceptions.UnauthorizedException;
 import com.jibruski.store.domain.Category;
 import com.jibruski.store.domain.User;
 import com.jibruski.store.dto.CategoryDto.CategoryRequest;
@@ -33,7 +36,7 @@ public class CategoryService {
         Category existing = categoryRepository.findByName(request.name()).orElse(null);
 
         if(existing != null && existing.getUser().getId().equals(userService.getCurrentUserId())){
-            throw new RuntimeException("Category already exists");
+            throw new ConflictException("Category already exists");
         }
 
         Category category = new Category();
@@ -67,13 +70,13 @@ public class CategoryService {
     private User getCurrentUser() {
         Long userId = userService.getCurrentUserId();
         return userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("Authenticated user not found in database"));
+            .orElseThrow(() -> new UnauthorizedException("Authenticated user not found in database"));
     }
 
     private Category getCategory(Long id){
         Category category = categoryRepository.findByIdAndActiveTrue(id).orElse(null);
         if(category == null || !category.getUser().getId().equals(userService.getCurrentUserId())){
-            throw new RuntimeException("Category not found");
+            throw new ResourceNotFoundException("Category not found");
         }
 
         return category;

@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.ConflictException;
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
+import com.jibruski.exceptionstarter.exceptions.UnauthorizedException;
 import com.jibruski.store.domain.Category;
 import com.jibruski.store.domain.Product;
 import com.jibruski.store.domain.User;
@@ -40,7 +43,7 @@ public class ProductService {
         Category category = getProductCategory(request.categoryId());
 
         if(productRepository.findByName(request.name()).isPresent()){
-            throw new RuntimeException("Product already exists");
+            throw new ConflictException("Product already exists");
         }
 
         Product product = new Product();
@@ -75,7 +78,7 @@ public class ProductService {
         Category category = categoryRepository.findByIdAndActiveTrue(categoryId).orElse(null);
 
         if(category == null || !category.getUser().getId().equals(userService.getCurrentUserId())){
-            throw new RuntimeException("Category not found");
+            throw new ResourceNotFoundException("Category not found");
         }
 
         return category;
@@ -84,7 +87,7 @@ public class ProductService {
     private Product getProduct(Long id){
         Product product = productRepository.findByIdAndActiveTrue(id).orElse(null);
         if(product == null || !product.getUser().getId().equals(userService.getCurrentUserId())){
-            throw new RuntimeException("Product not found");
+            throw new ResourceNotFoundException("Product not found");
         }
 
         return product;
@@ -93,6 +96,6 @@ public class ProductService {
     private User getCurrentUser(){
         Long userId = userService.getCurrentUserId();
         return userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("Authenticated user not found in database"));
+            .orElseThrow(() -> new UnauthorizedException("Authenticated user not found in database"));
     }
 }

@@ -20,6 +20,8 @@ import com.jibruski.store.enums.UserRole;
 import com.jibruski.store.repository.CartRepository;
 import com.jibruski.store.repository.RefreshTokenRepository;
 import com.jibruski.store.repository.UserRepository;
+import com.jibruski.exceptionstarter.exceptions.ConflictException;
+import com.jibruski.exceptionstarter.exceptions.UnauthorizedException;
 import com.jibruski.jwtauth.model.UserPrincipal;
 import com.jibruski.jwtauth.service.JwtService;
 
@@ -37,7 +39,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request){
         if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new RuntimeException("Email already in use");
+            throw new ConflictException("Email already in use");
         }
 
         User user = new User();
@@ -57,7 +59,7 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email()).orElse(null);
         if(user == null || !passwordEncoder.matches(request.password(), user.getPassword())){
-            throw new RuntimeException("Invalid credentials");
+            throw new UnauthorizedException("Invalid credentials");
         }
 
         UserPrincipal principal = new UserPrincipal(user.getId().toString(), List.of(user.getRole().toString()));
@@ -70,7 +72,7 @@ public class AuthService {
     public RefreshResponse refreshAccessToken(RefreshRequest request) {
         Claims claims = jwtService.parseAndValidate(request.refreshToken());
         if (!jwtService.isRefreshToken(claims)) {
-            throw new RuntimeException("Invalid credentials");
+            throw new UnauthorizedException("Invalid credentials");
         }
 
         validateAndGet(request.refreshToken());
@@ -99,10 +101,10 @@ public class AuthService {
 
     private RefreshToken validateAndGet(String rawToken) {
         RefreshToken stored = tokenRepository.findByTokenHash(hash(rawToken))
-            .orElseThrow(() -> new RuntimeException("Refresh token not recognized"));
+            .orElseThrow(() -> new UnauthorizedException("Refresh token not recognized"));
         
         if(stored.isRevoked() || stored.getExpiryDate().isBefore(Instant.now())){
-            throw new RuntimeException("Refresh token is no longer valid");
+            throw new UnauthorizedException("Refresh token is no longer valid");
         }
 
         return stored;

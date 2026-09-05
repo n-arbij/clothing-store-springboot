@@ -2,6 +2,7 @@ package com.jibruski.store.service;
 
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.BusinessRuleException;
 import com.jibruski.store.domain.ProductVariant;
 import com.jibruski.store.repository.ProductVariantRepository;
 
@@ -17,11 +18,11 @@ public class StockValidationService {
             .orElseThrow(() -> new RuntimeException("Variant not found: " + variantId));
 
         if (requestedQuantity <= 0) {
-            throw new IllegalArgumentException("Requested quantity must be greater than zero");
+            throw new BusinessRuleException("Requested quantity must be greater than zero");
         }
 
         if (variant.getStockQuantity() < requestedQuantity) {
-            throw new RuntimeException(
+            throw new BusinessRuleException(
                 "Only " + variant.getStockQuantity() + " left in stock for SKU " + variant.getSku());
         }
     }
