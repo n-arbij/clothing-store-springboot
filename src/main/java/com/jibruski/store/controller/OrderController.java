@@ -68,4 +68,10 @@ public class OrderController {
         orderService.cancelOrder(orderId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{orderId}/refund")
+    public ResponseEntity<Void> refundOrder(@PathVariable Long orderId) {
+        orderService.refundOrder(orderId);
+        return ResponseEntity.noContent().build();
+    }
 }

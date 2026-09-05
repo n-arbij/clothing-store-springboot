@@ -177,7 +177,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void adminRefundOrder(Long orderId) {
+    public void refundOrder(Long orderId) {
         Order order = getOrder(orderId);
         if (order.getStatus() != OrderStatus.PAID && order.getStatus() != OrderStatus.SHIPPED
             && order.getStatus() != OrderStatus.DELIVERED) {
