@@ -30,24 +30,32 @@ public class PaymentService {
         return PaymentResponse.fromEntity(payment);
     }
 
-    @Transactional
     public PaymentResponse initiatePayment(Order order, PaymentMethod method){
+        Payment payment = createPendingPayment(order, method);
+
+        PaymentResult result = paymentProcessor.process(payment);
+        finalizePayment(payment, result);
+
+        return PaymentResponse.fromEntity(payment);
+    }
+
+    @Transactional
+    public Payment createPendingPayment(Order order, PaymentMethod method){
         Payment payment = new Payment();
         payment.setOrder(order);
         payment.setAmount(order.getTotalAmount());
         payment.setMethod(method);
         payment.setStatus(PaymentStatus.PENDING);
-        paymentRepository.save(payment);
+        return paymentRepository.save(payment);
+    }
 
-        PaymentResult result = paymentProcessor.process(payment);
-
+    @Transactional
+    public void finalizePayment(Payment payment, PaymentResult result){
         if (result.success()) {
             confirmPayment(payment, result.transactionId());
         } else{
             failPayment(payment, result.message());
         }
-
-        return PaymentResponse.fromEntity(payment);
     }
 
     @Transactional
