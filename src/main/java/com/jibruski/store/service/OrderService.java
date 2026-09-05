@@ -35,6 +35,7 @@ public class OrderService {
     private final CurrentUserService userService;
     private final StockValidationService validationService;
     private final PaymentService paymentService;
+    private final CartService cartService;
 
     @EventListener
     public void OnPaymentSucceeded(PaymentSucceededEvent event){
@@ -97,12 +98,13 @@ public class OrderService {
         order.setTotalAmount(total);
         Order savedOrder = orderRepository.save(order);
         paymentService.initiatePayment(savedOrder, req.method());
+        cartService.clearCart();
          
         return OrderResponse.fromEntity(savedOrder);
     }
 
     @Transactional
-    public void markAsPaid(Long orderId){
+    private void markAsPaid(Long orderId){
         Order order = getOrder(orderId);
         if(order.getStatus() != OrderStatus.PENDING){
             throw new RuntimeException("Order must be pending before it can be marked paid");
