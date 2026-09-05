@@ -8,12 +8,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jibruski.store.dto.OrderDto.CheckoutReq;
 import com.jibruski.store.dto.OrderDto.OrderResponse;
 import com.jibruski.store.service.OrderService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -38,14 +41,8 @@ public class OrderController {
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<OrderResponse> checkout() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.checkout());
-    }
-
-    @PatchMapping("/{orderId}/pay")
-    public ResponseEntity<Void> markAsPaid(@PathVariable Long orderId) {
-        orderService.markAsPaid(orderId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<OrderResponse> checkout(@Valid @RequestBody CheckoutReq req) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.checkout(req));
     }
 
     @PatchMapping("/{orderId}/ship")
@@ -63,6 +60,12 @@ public class OrderController {
     @PatchMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
         orderService.cancelOrder(orderId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{orderId}/refund")
+    public ResponseEntity<Void> refundOrder(@PathVariable Long orderId) {
+        orderService.refundOrder(orderId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -7,6 +7,9 @@ import com.jibruski.store.domain.Order;
 import com.jibruski.store.domain.OrderItem;
 import com.jibruski.store.dto.ProductVariantDto.ProductVariantRes;
 import com.jibruski.store.enums.OrderStatus;
+import com.jibruski.store.enums.PaymentMethod;
+
+import jakarta.validation.constraints.NotNull;
 
 public class OrderDto {
     public record OrderResponse (
@@ -44,4 +47,13 @@ public class OrderDto {
             );
         }
     }
+
+    public record CheckoutReq(
+        @NotNull PaymentMethod method
+    ) {}
+
+    public record RetryPaymentReq(
+        @NotNull Long orderId,
+        @NotNull PaymentMethod method
+    ) {}
 }
