@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.jibruski.store.domain.Order;
 import com.jibruski.store.domain.Payment;
 import com.jibruski.store.domain.PaymentProcessor;
+import com.jibruski.store.dto.PaymentDto.PaymentResponse;
 import com.jibruski.store.dto.PaymentDto.PaymentResult;
 import com.jibruski.store.enums.PaymentMethod;
 import com.jibruski.store.enums.PaymentStatus;
@@ -21,9 +22,16 @@ public class PaymentService {
     private final PaymentProcessor paymentProcessor;
     private final ApplicationEventPublisher eventPublisher;
 
+    public PaymentResponse getByOrderId(Long orderId){
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(
+            () -> new RuntimeException("Payment not found")
+        );
+
+        return PaymentResponse.fromEntity(payment);
+    }
 
     @Transactional
-    public Payment initiatePayment(Order order, PaymentMethod method){
+    public PaymentResponse initiatePayment(Order order, PaymentMethod method){
         Payment payment = new Payment();
         payment.setOrder(order);
         payment.setAmount(order.getTotalAmount());
@@ -39,7 +47,7 @@ public class PaymentService {
             failPayment(payment, result.message());
         }
 
-        return payment;
+        return PaymentResponse.fromEntity(payment);
     }
 
     @Transactional
@@ -58,6 +66,20 @@ public class PaymentService {
         eventPublisher.publishEvent(new PaymentFailedEvent(payment.getOrder().getId()));
     }
 
+    @Transactional
+    public void refundPayment(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+            .orElseThrow(() -> new RuntimeException("Payment not found: " + paymentId));
+
+        if (payment.getStatus() != PaymentStatus.SUCCESS) {
+            throw new RuntimeException("Only successful payments can be refunded");
+        }
+
+        payment.setStatus(PaymentStatus.REFUNDED);
+        paymentRepository.save(payment);
+    }
+
     public record PaymentSucceededEvent(Long orderId) {}
     public record PaymentFailedEvent(Long orderId) {}
+    public record PaymentRefundedEvent(Long orderId) {}
 }
