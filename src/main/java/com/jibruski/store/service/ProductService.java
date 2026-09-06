@@ -58,6 +58,9 @@ public class ProductService {
 
     @Transactional
     public ProductResponse update(Long id, ProductRequest request){
+        if(productRepository.findByName(request.name()).isPresent()){
+            throw new ConflictException("Product already exists");
+        }
         Category category = getProductCategory(request.categoryId());
         Product product = getProduct(id);
 
