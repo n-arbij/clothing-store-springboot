@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.BusinessRuleException;
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
 import com.jibruski.store.domain.Cart;
 import com.jibruski.store.domain.CartItem;
 import com.jibruski.store.domain.Order;
@@ -64,11 +66,11 @@ public class OrderService {
     @Transactional
     public OrderResponse checkout(CheckoutReq req){
         Cart cart = cartRepository.findByUserId(userService.getCurrentUserId()).orElseThrow(
-            () -> new RuntimeException("Cart not found")
+            () -> new ResourceNotFoundException("Cart not found")
         );
 
         if(cart.getItems().isEmpty()){
-            throw new RuntimeException("Cannot checkout an empty cart");
+            throw new BusinessRuleException("Cannot checkout an empty cart");
         }
 
         Order order = new Order();
@@ -107,7 +109,7 @@ public class OrderService {
     private void markAsPaid(Long orderId){
         Order order = getOrder(orderId);
         if(order.getStatus() != OrderStatus.PENDING){
-            throw new RuntimeException("Order must be pending before it can be marked paid");
+            throw new BusinessRuleException("Order must be pending before it can be marked paid");
         }
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
@@ -117,7 +119,7 @@ public class OrderService {
     public void markAsShipped(Long orderId){
         Order order = getOrder(orderId);
         if(order.getStatus() != OrderStatus.PAID){
-            throw new RuntimeException("Order must be paid before being shipped");
+            throw new BusinessRuleException("Order must be paid before being shipped");
         }
         order.setStatus(OrderStatus.SHIPPED);
         orderRepository.save(order);
@@ -127,7 +129,7 @@ public class OrderService {
     public void markAsDelivered(Long orderId){
         Order order = getOrder(orderId);
         if(order.getStatus() != OrderStatus.SHIPPED){
-            throw new RuntimeException("Order must be shipped before it can be marked delivered");
+            throw new BusinessRuleException("Order must be shipped before it can be marked delivered");
         }
         order.setStatus(OrderStatus.DELIVERED);
         orderRepository.save(order);
@@ -137,7 +139,7 @@ public class OrderService {
     public void markAsPaymentFailed(Long orderId){
         Order order = getOrder(orderId);
         if(order.getStatus() != OrderStatus.PENDING){
-            throw new RuntimeException("Payment fails only on pending transactions");
+            throw new BusinessRuleException("Payment fails only on pending transactions");
         }
         order.setStatus(OrderStatus.PAYMENT_FAILED);
         orderRepository.save(order);
@@ -147,7 +149,7 @@ public class OrderService {
     public void cancelOrder(Long orderId){
         Order order = getOrder(orderId);
         if(order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.PAID){
-            throw new RuntimeException("Cannot cancel a processed order");
+            throw new BusinessRuleException("Cannot cancel a processed order");
         }
         boolean wasPaid = order.getStatus() == OrderStatus.PAID;
 
@@ -164,7 +166,7 @@ public class OrderService {
     public void retryPayment(RetryPaymentReq req) {
         Order order = getOrder(req.orderId());
         if (order.getStatus() != OrderStatus.PAYMENT_FAILED) {
-            throw new RuntimeException("Only failed payments can be retried");
+            throw new BusinessRuleException("Only failed payments can be retried");
         }
         paymentService.initiatePayment(order, req.method());
     }
@@ -174,7 +176,7 @@ public class OrderService {
         Order order = getOrder(orderId);
         if (order.getStatus() != OrderStatus.PAID && order.getStatus() != OrderStatus.SHIPPED
             && order.getStatus() != OrderStatus.DELIVERED) {
-            throw new RuntimeException("Order not eligible for refund");
+            throw new BusinessRuleException("Order not eligible for refund");
         }
 
         restoreStock(order.getOrderItems());
@@ -187,7 +189,7 @@ public class OrderService {
     private Order getOrder(Long id){
         Order order = orderRepository.findById(id).orElse(null);
         if(order == null || !order.getUser().getId().equals(userService.getCurrentUserId())){
-            throw new RuntimeException("Order not found");
+            throw new ResourceNotFoundException("Order not found");
         }
 
         return order;

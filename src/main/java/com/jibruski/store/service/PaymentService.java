@@ -3,6 +3,8 @@ package com.jibruski.store.service;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.BusinessRuleException;
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
 import com.jibruski.store.domain.Order;
 import com.jibruski.store.domain.Payment;
 import com.jibruski.store.domain.PaymentProcessor;
@@ -24,7 +26,7 @@ public class PaymentService {
 
     public PaymentResponse getByOrderId(Long orderId){
         Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(
-            () -> new RuntimeException("Payment not found")
+            () -> new ResourceNotFoundException("Payment not found")
         );
 
         return PaymentResponse.fromEntity(payment);
@@ -77,10 +79,10 @@ public class PaymentService {
     @Transactional
     public void refundPayment(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
-            .orElseThrow(() -> new RuntimeException("Payment not found: " + paymentId));
+            .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + paymentId));
 
         if (payment.getStatus() != PaymentStatus.SUCCESS) {
-            throw new RuntimeException("Only successful payments can be refunded");
+            throw new BusinessRuleException("Only successful payments can be refunded");
         }
 
         payment.setStatus(PaymentStatus.REFUNDED);

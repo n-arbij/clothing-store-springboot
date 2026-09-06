@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,11 +48,13 @@ public class ProductVariantController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductVariantRes> create(@Valid @RequestBody ProductVariantReq req){
         return ResponseEntity.status(HttpStatus.CREATED).body(variantService.create(req));
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductVariantRes> update(
         @PathVariable Long id,
         @Valid @RequestBody ProductVariantReq req
@@ -60,6 +63,7 @@ public class ProductVariantController {
     }
 
     @PatchMapping("/{id}/remove")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id){
         variantService.delete(id);
         return ResponseEntity.noContent().build();
