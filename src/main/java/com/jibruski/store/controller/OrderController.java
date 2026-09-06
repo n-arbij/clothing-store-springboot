@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +37,7 @@ public class OrderController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<OrderResponse>> getAll(Pageable pageable) {
         return ResponseEntity.ok(orderService.getAll(pageable));
     }
@@ -46,12 +48,14 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderId}/ship")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> markAsShipped(@PathVariable Long orderId) {
         orderService.markAsShipped(orderId);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{orderId}/deliver")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> markAsDelivered(@PathVariable Long orderId) {
         orderService.markAsDelivered(orderId);
         return ResponseEntity.noContent().build();
@@ -64,6 +68,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderId}/refund")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> refundOrder(@PathVariable Long orderId) {
         orderService.refundOrder(orderId);
         return ResponseEntity.noContent().build();
