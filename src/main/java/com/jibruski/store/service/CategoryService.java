@@ -35,7 +35,7 @@ public class CategoryService {
     public CategoryResponse create(CategoryRequest request){
         Category existing = categoryRepository.findByName(request.name()).orElse(null);
 
-        if(existing != null && existing.getUser().getId().equals(userService.getCurrentUserId())){
+        if(existing.getName().equals(request.name())){
             throw new ConflictException("Category already exists");
         }
 
@@ -51,10 +51,15 @@ public class CategoryService {
 
     @Transactional
     public CategoryResponse update(Long id, CategoryRequest request){
+        Category existing = categoryRepository.findByName(request.name()).orElse(null);
         Category category = getCategory(id);
 
-        if(request.name() != null) category.setName(request.name());
-        if(request.slug() != null) category.setSlug(request.slug());
+        if(existing != null && !existing.getName().equals(request.name())){
+            if(request.name() != null) category.setName(request.name());
+            if(request.slug() != null) category.setSlug(request.slug());
+        } else{
+            throw new ConflictException("Category already exists");
+        }
 
         categoryRepository.save(category);
         return CategoryResponse.fromEntity(category);
